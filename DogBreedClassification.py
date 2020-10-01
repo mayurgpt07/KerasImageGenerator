@@ -49,11 +49,15 @@ input_tensor = Input(shape=(224,224,3))
 # fc2 = Dense(120, activation='softmax')(flatten1)
 
 model = tf.keras.models.Sequential([
-  tf.keras.layers.Conv2D(256, (3,3), activation='relu', input_shape=(150, 150, 3), padding = 'same'),
+  tf.keras.layers.Conv2D(512, (3,3), activation='relu', input_shape=(150, 150, 3), padding = 'same'),
   tf.keras.layers.MaxPooling2D((2, 2), padding = 'same'),
   tf.keras.layers.Dropout(rate = 0.4),
   tf.keras.layers.BatchNormalization(),
-  tf.keras.layers.SeparableConv2D(256, (3, 3), activation = 'relu',padding='same', dilation_rate=(2, 2)),
+  tf.keras.layers.Conv2D(512, (3, 3), activation = 'relu',padding='same', dilation_rate=(2, 2)),
+  tf.keras.layers.MaxPooling2D((2,2), padding = 'same'),
+  tf.keras.layers.Dropout(rate = 0.4),
+  tf.keras.layers.BatchNormalization(),
+  tf.keras.layers.Conv2D(256, (3, 3), activation = 'relu',padding='same', dilation_rate=(2, 2)),
   tf.keras.layers.MaxPooling2D((2,2), padding = 'same'),
   tf.keras.layers.Dropout(rate = 0.4),
   tf.keras.layers.BatchNormalization(),
@@ -63,7 +67,7 @@ model = tf.keras.models.Sequential([
 ])
 
 model.compile(loss = 'categorical_crossentropy', optimizer = 'adam', metrics = ['acc'])
-model.fit(train_images, epochs = 20, batch_size = 64)
+model.fit(train_images, epochs = 40, batch_size = 128, validation_data = val_images)
 print(model.summary())
 # model.fit_generator(
 #     train_images,
