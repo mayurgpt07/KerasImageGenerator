@@ -10,10 +10,9 @@ from tensorflow.keras.applications import vgg16
 from tensorflow.keras.optimizers import RMSprop
 from tensorflow.keras import Input
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from sklearn.model_selection import train_test_split
 
 
-datagen = ImageDataGenerator(rescale=1/255, validation_split=0.3, preprocessing_function=preprocess_input)
+datagen = ImageDataGenerator(rescale=1/255, validation_split=0.2, preprocessing_function=preprocess_input)
 datagen_test = ImageDataGenerator(rescale=1/255)
 
 train_images =  datagen.flow_from_directory(
@@ -53,15 +52,16 @@ test_images = datagen_test.flow_from_directory(
 
 ## Custom model for identification 
 model = tf.keras.models.Sequential([
-  tf.keras.layers.Conv2D(512, (3,3), activation='relu', input_shape=(150, 150, 3)),
+  tf.keras.layers.Conv2D(256, (3,3), activation='relu', input_shape=(150, 150, 3)),
   tf.keras.layers.MaxPooling2D((2, 2)),
   tf.keras.layers.Dropout(rate = 0.4),
   tf.keras.layers.BatchNormalization(),
-  tf.keras.layers.Conv2D(512, (3, 3), activation = 'relu'),
+  tf.keras.layers.Conv2D(256, (3, 3), activation = 'relu'),
   tf.keras.layers.MaxPooling2D((2,2)),
   tf.keras.layers.Dropout(rate = 0.4),
   tf.keras.layers.BatchNormalization(),
   tf.keras.layers.Flatten(),
+  ## Add more layers based on your system performance
   tf.keras.layers.Dense(128, activation='relu'),
   tf.keras.layers.Dense(120, activation='softmax')
 ])
@@ -69,3 +69,11 @@ model = tf.keras.models.Sequential([
 model.compile(loss = 'categorical_crossentropy', optimizer = 'adam', metrics = ['acc'])
 model.fit(train_images, epochs = 40, batch_size = 128, validation_data = val_images)
 print(model.summary())
+
+test_generator.reset()
+
+model.evaluate(test_images)
+predict = model.predict(test_images, batch_size = 128)
+
+classification = np.argmax(predict, axis = 1)
+
